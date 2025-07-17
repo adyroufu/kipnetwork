@@ -1,0 +1,571 @@
+<style>
+  /* Global Styles */
+  body {
+    font-family: poppins, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan */
+  }
+
+  /* Main Layout - Flexbox for sidebar and content */
+  .main-wrapper {
+    display: flex;
+    min-height: 100vh; /* Pastikan wrapper mengambil tinggi penuh viewport */
+  }
+
+  /* Left Sidebar Navigation */
+  .sidebar {
+    width: 200px; /* Lebar sidebar */
+    background-color: #ff0000; /* Warna merah */
+    color: white;
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Jangan biarkan sidebar menyusut */
+  }
+  .sidebar h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: white;
+  }
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .sidebar ul li a {
+    display: block;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+  .sidebar ul li a:hover {
+    background-color: #cc0000; /* Merah lebih gelap saat hover */
+  }
+  .sidebar ul li.active a {
+    background-color: #cc0000; /* Merah lebih gelap untuk yang aktif */
+    font-weight: bold;
+  }
+
+  /* Main Content Area */
+  .content-area {
+    text-align: center;
+    flex-grow: 1; /* Konten akan mengisi sisa ruang */
+    padding: 20px 30px;
+    background-color: #fff;
+  }
+  .content-area h1 {
+    color: #555;
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+  .content-area h3 {
+    color: #777;
+    margin-top: 0;
+    margin-bottom: 30px;
+  }
+
+  /* Form Container */
+  .form-container {
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 700px; /* Lebar maksimum form */
+    margin: 0 auto; /* Tengah di area konten */
+  }
+  .form-container h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+    text-align: center;
+  }
+
+  /* Form Group - for label and input alignment */
+  .form-group {
+    display :flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .form-group label {
+    width: 250px; /* Lebar label yang tetap */
+    text-align: left;
+    margin-right: 10px;
+    font-weight:normal;
+    flex-shrink: 0;
+  }
+  .form-group .input-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+  }
+  .form-group .input-wrapper::before {
+    content: ':'; /* Menambahkan titik dua */
+    margin-right: 5px;
+  }
+
+  /* Input fields, select, textarea */
+  input[type="text"], select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    flex-grow: 1;
+    background-color: #fff;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+
+  /* Buttons */
+  .form-buttons {
+    display: flex;
+    justify-content: flex-start; /* Mengatur posisi tombol */
+    margin-top: 20px;
+  }
+  .form-buttons button {
+    margin-right: 10px; /* Jarak antar tombol */
+  }
+  button.clear-button {
+    background-color: #f44336; /* Merah untuk Clear Data */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  button.clear-button:hover {
+    background-color: #d32f2f;
+  }
+  button.copy-button {
+    background-color: #4CAF50; /* Hijau untuk Copy Notes */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px; /* Jarak dari output */
+  }
+  button.copy-button:hover {
+    background-color: #45a049;
+  }
+
+  /* Output and Error Messages */
+  .error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 15px;
+    text-align: center;
+  }
+  .output-info {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #e0f2f7; /* Warna latar belakang untuk info output */
+    border-left: 5px solid #2196F3; /* Garis biru di kiri */
+    color: #0d47a1;
+    font-size: 14px;
+  }
+  .output-info p {
+    margin: 0 0 5px 0;
+  }
+  #formattedOutput {
+    white-space: pre-wrap; /* Mempertahankan spasi dan baris baru */
+    word-wrap: break-word; /* Memecah kata panjang */
+    font-family: monospace; /* Font monospace untuk output seperti kode */
+    font-size: 13px;
+    color: #333;
+    background-color: #ffffff;
+    border: 1px dashed #cccccc;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    color: #777;
+    font-size: 13px;
+  }
+
+</style>
+
+<div class="main-wrapper">
+  <div class="sidebar">
+    <h2>QC Project</h2>
+    <ul>
+      <li class="active"><a href="#">KIP Network</a></li>
+      <li ><a href="#">KIP Reaktivasi</a></li>
+    </ul>
+  </div>
+
+  <div class="content-area">
+    <h1>Tools KIP</h1>
+    <h3>Formater Network</h3>
+
+    <div class="form-container">
+      <h2>KIP Network</h2>
+
+      <div class="form-group">
+        <label for="Braket network">Braket network</label>
+        <div class="input-wrapper">
+          <select id="bracketnetwork" onchange="updateOutput()">
+             <option value="">Pilih Bracket [NO] untuk network domestik</option>
+             <option value="[NO]">[NO]</option>
+            <option value="[INT][NO]">[INT][NO]</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="bracketSegment">Braket Segment</label>
+        <div class="input-wrapper">
+          <select id="bracketSegment" onchange="updateOutput()">
+             <option value="">Pilih Bracket</option>
+             <option value="[VC]">[VC]</option>
+             <option value="[Video call]">[Video call]</option>
+             <option value="[va apps]">[va apps]</option>
+             <option value="[va facebook]">[va facebook]</option>
+             <option value="[va ig]">[va ig]</option>
+             <option value="[va line]">[va line]</option>
+             <option value="[va Max]">[va Max]</option>
+             <option value="[va Orbit]">[va Orbit]</option>
+             <option value="[va telegram]">[va telegram]</option>
+             <option value="[va web]">[va web]</option>
+             <option value="[va wa]">[va wa]</option>
+             <option value="[va cc]">[va cc]</option>
+             <option value="[fb]">[fb]</option>         
+             <option value="[tw]">[tw]</option>
+             <option value="[ig]">[ig]</option>
+             <option value="[email]">[email]</option>
+             <option value="[ig mytsel]">[ig mytsel]</option>
+             <option value="[ig dm mytsel]">[ig dm mytsel]</option>
+             <option value="[tw dm]">[tw dm]</option>
+             <option value="[ig dm]">[ig dm]</option>
+             <option value="[ig DM Orbit]">[Ig DM Orbit]</option>
+             <option value="[email orbit]">[email orbit]</option>
+             <option value="[Playstore]">[Playstore]</option>
+             <option value="[Playstore orbit]">[Playstore orbit]</option>
+             <option value="[IT-HO-Ops-MWA]">[IT-HO-Ops-MWA]</option>
+             <option value="[IT-HO-Ops-DIGIPOS]">[IT-HO-Ops-DIGIPOS]</option>
+             <option value="[ih.fb]">[ih.fb]</option>
+             <option value="[ih.fbdm]">[ih.fbdm]</option>
+             <option value="[ih.tw]">[ih.tw]</option>
+             <option value="[ih.twdm]">[ih.twdm]</option>
+             <option value="[ih.ig]">[ih.ig]</option>
+             <option value="[ih.igdm]">[ih.igdm]</option>
+             <option value="[ih.wa]">[ih.wa]</option>
+             <option value="[ih.email]">[ih.email]</option>
+            
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tier">Tier</label>
+        <div class="input-wrapper">
+          <select id="tier" onchange="updateOutput()">
+            <option value="">Pilih Tier</option>
+            <option value="[Diamond]">[Diamond]</option>
+            <option value="[Platinum]">[Platinum]</option>
+            <option value="[Gold]">[Gold]</option>
+            <option value="[Silver]">Silver</option>
+            <option value="[Unidentified]">[Unidentified]</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="namaCustomer">Nama Customer</label>
+        <div class="input-wrapper">
+          <input type="text" id="namaCustomer" placeholder="Nama pelanggan / akun pelanggan" oninput="updateOutput()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="msisdnA">MSISDN-A Yang Menghubungi</label>
+        <div class="input-wrapper">
+          <input type="text" id="msisdnA" placeholder="Nomor yang menghubungi" oninput="updateOutput()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="msisdnB">MSISDN-B Yang Bermasalah</label>
+        <div class="input-wrapper">
+          <input type="text" id="msisdnB" placeholder="Nomor Bermasalah" oninput="updateOutput()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tanggal / waktu Kejadian">Tanggal Kejadian</label>
+        <div class="input-wrapper">
+          <input type="text" id="tanggalKejadian" placeholder="format dd/mm/yyyy hh:mm - hh:mm" oninput="updateOutput()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="Lokasi Pelanggan">Lokasi Pelanggan (alamat)</label>
+        <div class="input-wrapper">
+          <input type="text" id="Lokasi" placeholder="minimal terinput kota/kab, kel, kec, provinsi" oninput="updateOutput()">
+        </div>
+      </div>
+
+       <div class="form-group">
+        <label for="Koordinat customer">Koordinat Customer</label>
+        <div class="input-wrapper">
+          <input type="text" id="Koordinat" placeholder="input jika ada" oninput="updateOutput()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="segmentasiKartu">Segmentasi Kartu</label>
+        <div class="input-wrapper">
+          <select id="segmentasiKartu" onchange="updateOutput()">
+            <option value="">Pilih Segmentasi</option>
+            <option value="SimPATI">SimPATI</option>
+            <option value="Kartu AS">Kartu AS</option>
+            <option value="Loop">Loop</option>
+            <option value="Kartu Halo">Kartu Halo</option>
+            <option value="Telkomsel Prabayar">Telkomsel Prabayar</option>
+            <option value="Orbit">Orbit</option>
+            <option value="byU">byU</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="simCapability">SIM Capability</label>
+        <div class="input-wrapper">
+          <select id="simCapability" onchange="updateOutput()">
+            <option value="">Pilih</option>
+            <option value="SIM">SIM</option>
+            <option value="USIM">USIM</option>
+            <option value="ESIM">ESIM</option>
+          </select>
+        </div>
+      </div>
+
+            <div class="form-group">
+        <label for="customerTier">Customer Tier Pelanggan</label>
+        <div class="input-wrapper">
+          <select id="customerTier" onchange="updateOutput()">
+            <option value="">Pilih tier</option>
+            <option value="Diamond">Diamond</option>
+            <option value="Platinum">Platinum</option>
+            <option value="Gold">Gold</option>
+            <option value="Silver">Silver</option>
+            <option value="Unidentified">Unidentified</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="caseOwner">Case Owner</label>
+        <div class="input-wrapper">
+          <select id="caseOwner" onchange="updateOutput()">
+            <option value="">Pilih</option>
+            <option value="E-Care Bandung">E-Care Bandung</option>
+            <option value="E-Care Semarang">E-Care Semarang</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="detailComplain">Detail Complain</label>
+        <div class="input-wrapper">
+          <input type="text" id="detailComplain" placeholder="tulis detail complain" oninput="updateOutput()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="ads">Additional Information</label>
+        <div class="input-wrapper">
+          <input type="text" id="ads" placeholder="tambahan informasi jika ada" oninput="updateOutput()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="capture">Capture Bukti Pelanggan</label>
+        <div class="input-wrapper">
+          <input type="text" textarea id="capture" placeholder="bisa berupa prnt (jika ada)" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="captureCCA">Capture CCA</label>
+        <div class="input-wrapper">
+          <input type="text" textarea id="captureCCA" placeholder="bisa berupa prnt (jika ada)" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="HasilCCA">Hasil Analisa CCA</label>
+        <div class="input-wrapper">
+          <input type="text" textarea id="HasilCCA" placeholder="hasil analisa CCA" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="Possible rootcouse">Possible rootcouse</label>
+        <div class="input-wrapper">
+          <input type="text" textarea id="Possible rootcouse" placeholder="copas text" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="Remarks">Remarks</label>
+        <div class="input-wrapper">
+          <input type="text" textarea id="Remarks" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="Suggestion">Suggestion</label>
+        <div class="input-wrapper">
+          <input type="text" textarea id="Suggestion" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="solusiDiberikan">Solusi yang telah diberikan</label>
+        <div class="input-wrapper">
+          <input type="text" textarea id="solusiDiberikan" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <button class="clear-button" onclick="clearFormData()">Clear Data</button>
+      </div>
+
+      <p class="error-message" id="errorMessage"></p>
+
+      <div class="output-info">
+        <p style="color: red; font-weight: bold;">Pilih KIP dengan sesuai!</p>
+        <div id="formattedOutput"></div>
+        <button class="copy-button" onclick="copyNotesKIP()">Copy Notes KIP</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      2025 © BY AR
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function updateOutput() {
+    const bracketnetwork = document.getElementById('bracketnetwork').value;
+    const bracketSegment = document.getElementById('bracketSegment').value;
+    const tier = document.getElementById('tier').value;
+    const namaCustomer = document.getElementById('namaCustomer').value;
+    const msisdnA = document.getElementById('msisdnA').value;
+    const msisdnB = document.getElementById('msisdnB').value;
+    const tanggalKejadian = document.getElementById('tanggalKejadian').value;
+    const Lokasi = document.getElementById('Lokasi').value;
+    const Koordinat = document.getElementById('Koordinat').value;
+    const segmentasiKartu = document.getElementById('segmentasiKartu').value;
+    const simCapability = document.getElementById('simCapability').value;
+    const customerTier = document.getElementById('customerTier').value;
+    const caseOwner = document.getElementById('caseOwner').value;
+    const detailComplain = document.getElementById('detailComplain').value;
+    const ads = document.getElementById('ads').value;
+    const capture = document.getElementById('capture').value;
+    const captureCCA = document.getElementById('captureCCA').value;
+    const hasilCCA = document.getElementById('HasilCCA').value;
+    const possibleRootCause = document.getElementById('Possible rootcouse').value;
+    const remarks = document.getElementById('Remarks').value;
+    const suggestion = document.getElementById('Suggestion').value;
+    const solusiDiberikan = document.getElementById('solusiDiberikan').value;
+
+    let formattedText = '';
+    const errorMessageElement = document.getElementById('errorMessage');
+
+    // Simple validation for required fields
+    if (bracketSegment === '' || tier === '' || namaCustomer === '' || msisdnA === '') {
+        errorMessageElement.textContent = 'Harap lengkapi Bidang Wajib (Braket Segment, Tier, Nama Customer, MSISDN-A)!';
+    } else {
+        errorMessageElement.textContent = ''; // Clear error message if fields are filled
+    }
+
+    // Format output as seen in the image
+    formattedText += bracketnetwork ;
+    formattedText += bracketSegment ;
+    formattedText += tier ;
+    formattedText += ` Nama Customer : ${namaCustomer}`;
+    formattedText += ` MSISDN-A Yang Menghubungi : ${msisdnA}`;
+    formattedText += ` MSISDN-B Yang Bermasalah : ${msisdnB}`;
+    formattedText += ` Tanggal Kejadian : ${tanggalKejadian}`;
+    formattedText += ` Lokasi Pelanggan : ${Lokasi}`;
+    formattedText += ` koordinat customer : ${Koordinat}`;
+    formattedText += ` Segmentasi Kartu : ${segmentasiKartu}`;
+    formattedText += ` SIM Capability : ${simCapability}`;
+    formattedText += ` Customer Tier Pelanggan : ${customerTier}`;
+    formattedText += ` Case Owner : ${caseOwner}`;
+    formattedText += ` Detail Complain : ${detailComplain}`;
+    formattedText += ` Additional Information : ${ads}`;
+    formattedText += ` Capture Bukti Pelanggan : ${capture}`;
+    formattedText += ` Capture CCA : ${captureCCA}`;
+    formattedText += ` Hasil Analisa CCA : ${hasilCCA}`;
+    formattedText += ` Possible rootcouse : ${possibleRootCause}`;
+    formattedText += ` Remarks : ${remarks}`;
+    formattedText += ` Suggestion : ${suggestion}`;
+    formattedText += ` Solusi yang telah diberikan : ${solusiDiberikan}`;
+
+    document.getElementById('formattedOutput').textContent = formattedText;
+  }
+
+  function clearFormData() {
+    const formElements = document.querySelectorAll('.form-container input[type="text"], .form-container select, .form-container textarea');
+    formElements.forEach(element => {
+      if (element.tagName === 'SELECT') {
+        element.selectedIndex = 0; // Reset dropdown to first option
+      } else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+        element.value = ''; // Clear text input and textarea
+      }
+    });
+    // Clear output and error message
+    document.getElementById('formattedOutput').textContent = '';
+    document.getElementById('errorMessage').textContent = '';
+    // Call updateOutput to reset initial output display
+    updateOutput();
+    alert('Semua data input dan output telah dibersihkan!');
+  }
+
+  function copyNotesKIP() {
+    const outputArea = document.getElementById('formattedOutput');
+    const textToCopy = outputArea.textContent;
+
+    // Create a temporary textarea element to copy text
+    const tempTextArea = document.createElement('textarea');
+    tempTextArea.value = textToCopy;
+    document.body.appendChild(tempTextArea);
+    
+    tempTextArea.select();
+    tempTextArea.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+      document.execCommand('copy');
+      alert('Notes KIP berhasil disalin ke clipboard!');
+    } catch (err) {
+      console.error('Gagal menyalin notes KIP: ', err);
+      alert('Gagal menyalin notes KIP. Silakan salin manual.');
+    } finally {
+      document.body.removeChild(tempTextArea); // Remove temporary element
+    }
+  }
+
+  // Initialize output on page load
+  document.addEventListener('DOMContentLoaded', updateOutput);
+</script>
